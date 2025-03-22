@@ -2,22 +2,21 @@ package project.InventoryManagmentSystem.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.InventoryManagmentSystem.dto.Response;
 import project.InventoryManagmentSystem.dto.TransactionRequest;
 import project.InventoryManagmentSystem.enums.TransactionStatus;
 import project.InventoryManagmentSystem.service.TransactionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 @RestController
 @RequestMapping("/api/transactions")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class TransactionController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
     @Autowired
     private final TransactionService transactionService;
 
@@ -37,25 +36,20 @@ public class TransactionController {
     }
 
     @GetMapping("/all")
-public ResponseEntity<Response> getAllTransactions(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size,
-        @RequestParam(required = false, defaultValue = "") String filter) {
+    public ResponseEntity<Response> getAllTransactions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1000") int size,
+            @RequestParam(required = false) String filter) {
 
-    int maxSize = Math.min(size, 500); // Limit max size to 500
-    logger.info("Fetching transactions - Page: {}, Size: {}, Filter: {}", page, maxSize, filter.isEmpty() ? "No filter applied" : filter);
-
-    return ResponseEntity.ok(transactionService.getAllTransactions(page, maxSize, filter));
-}
+        System.out.println("SEARCH VALUE IS: " +filter);
+        return ResponseEntity.ok(transactionService.getAllTransactions(page, size, filter));
+    }
 
 
-
-@GetMapping("/{id}")
-public ResponseEntity<Response> getTransactionById(@PathVariable Long id) {
-    return ResponseEntity.ok(transactionService.getAllTransactionById(id));
-}
-
-
+    @GetMapping("/{id}")
+    public ResponseEntity<Response> getTransactionById(@PathVariable Long id) {
+        return ResponseEntity.ok(transactionService.getAllTransactionById(id));
+    }
 
     @GetMapping("/by-month-year")
     public ResponseEntity<Response> getTransactionByMonthAndYear(

@@ -10,7 +10,6 @@ import project.InventoryManagmentSystem.enums.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -30,10 +29,10 @@ public class Transaction {
     private BigDecimal totalPrice;
 
     @Enumerated(EnumType.STRING)
-    private TransactionType transactionType; // purchase, sale, return
+    private TransactionType transactionType; // pruchase, sale, return
 
     @Enumerated(EnumType.STRING) // Store Enum as String in DB
-    
+    @Column(nullable = false)
     private TransactionStatus status; //pending, completed, processing
 
     private String description;
@@ -42,20 +41,33 @@ public class Transaction {
     private final LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updateAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    @JsonIgnore 
-    private Product product;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "product_id")
+    // private Product product;
 
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "user_id")
+    // private User user;
+
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "supplier_id")
+    // private Supplier supplier;
+
+     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    @JsonIgnore
+    private Product product;
+ 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonIgnore 
+    @JsonIgnore
     private User user;
-
+ 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id")
-    @JsonIgnore 
+    @JsonIgnore
     private Supplier supplier;
+ 
 
     @Override
     public String toString() {

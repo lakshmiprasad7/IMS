@@ -9,10 +9,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import project.InventoryManagmentSystem.dto.*;
-
+import project.InventoryManagmentSystem.dto.LoginRequest;
+import project.InventoryManagmentSystem.dto.RegisterRequest;
+import project.InventoryManagmentSystem.dto.Response;
+import project.InventoryManagmentSystem.dto.UserDTO;
 import project.InventoryManagmentSystem.entity.User;
 import project.InventoryManagmentSystem.enums.UserRole;
 import project.InventoryManagmentSystem.exceptions.InvalidCredentialsException;
@@ -22,12 +22,10 @@ import project.InventoryManagmentSystem.security.JwtUtils;
 import project.InventoryManagmentSystem.service.UserService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -35,9 +33,15 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     private final JwtUtils jwtUtils;
 
+
     @Override
     public Response registerUser(RegisterRequest registerRequest) {
-        UserRole role = (registerRequest.getRole() != null) ? registerRequest.getRole() : UserRole.MANAGER;
+
+        UserRole role = UserRole.MANAGER;
+
+        if (registerRequest.getRole() != null) {
+            role = registerRequest.getRole();
+        }
 
         User userToSave = User.builder()
                 .name(registerRequest.getName())
@@ -57,13 +61,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Response loginUser(LoginRequest loginRequest) {
+
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new NotFoundException("Email Not Found"));
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Password Does Not Match");
         }
-
         String token = jwtUtils.generateToken(user.getEmail());
 
         return Response.builder()
@@ -77,13 +81,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Response getAllUsers() {
+
         List<User> users = userRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
 
-        // Convert transactions to modifiable list before mapping
-        users.forEach(user -> user.setTransactions(user.getTransactions() != null ? 
-            user.getTransactions().stream().collect(Collectors.toList()) : null));
+        users.forEach(user -> user.setTransactions(null));
 
-        List<UserDTO> userDTOS = modelMapper.map(users, new TypeToken<List<UserDTO>>() {}.getType());
+        List<UserDTO> userDTOS = modelMapper.map(users, new TypeToken<List<UserDTO>>() {
+        }.getType());
 
         return Response.builder()
                 .status(200)
@@ -95,26 +99,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getCurrentLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User Not Found"));
 
-        // Convert transactions to a modifiable list before setting
-        user.setTransactions(user.getTransactions() != null ? 
-            user.getTransactions().stream().collect(Collectors.toList()) : null);
+        user.setTransactions(null);
 
         return user;
     }
 
     @Override
     public Response getUserById(Long id) {
+
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User Not Found"));
 
-        // Convert transactions to a modifiable list before mapping
-        user.setTransactions(user.getTransactions() != null ? 
-            user.getTransactions().stream().collect(Collectors.toList()) : null);
-
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+
+        userDTO.setTransactions(null);
 
         return Response.builder()
                 .status(200)
@@ -125,6 +127,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Response updateUser(Long id, UserDTO userDTO) {
+
         User existingUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User Not Found"));
 
         if (userDTO.getEmail() != null) existingUser.setEmail(userDTO.getEmail());
@@ -135,7 +138,6 @@ public class UserServiceImpl implements UserService {
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
-
         userRepository.save(existingUser);
 
         return Response.builder()
@@ -147,25 +149,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response deleteUser(Long id) {
         userRepository.findById(id).orElseThrow(() -> new NotFoundException("User Not Found"));
+
         userRepository.deleteById(id);
 
         return Response.builder()
                 .status(200)
                 .message("User successfully Deleted")
                 .build();
+
     }
 
     @Override
     public Response getUserTransactions(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User Not Found"));
 
-        // Convert transactions to modifiable list before mapping
-        user.setTransactions(user.getTransactions() != null ? 
-            user.getTransactions().stream().collect(Collectors.toList()) : null);
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User Not Found"));
 
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
 
-        // Set user and supplier to null inside transactions to avoid circular mapping issues
         userDTO.getTransactions().forEach(transactionDTO -> {
             transactionDTO.setUser(null);
             transactionDTO.setSupplier(null);
@@ -178,3 +178,4 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 }
+

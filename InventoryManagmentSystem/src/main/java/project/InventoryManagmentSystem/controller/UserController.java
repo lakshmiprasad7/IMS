@@ -1,8 +1,6 @@
 package project.InventoryManagmentSystem.controller;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +9,13 @@ import project.InventoryManagmentSystem.dto.UserDTO;
 import project.InventoryManagmentSystem.entity.User;
 import project.InventoryManagmentSystem.service.UserService;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     @Autowired
@@ -22,7 +23,6 @@ public class UserController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('ADMIN')")
-
     public ResponseEntity<Response> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
@@ -33,14 +33,12 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-   
     public ResponseEntity<Response> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         return ResponseEntity.ok(userService.updateUser(id, userDTO));
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-
     public ResponseEntity<Response> deleteUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.deleteUser(id));
     }

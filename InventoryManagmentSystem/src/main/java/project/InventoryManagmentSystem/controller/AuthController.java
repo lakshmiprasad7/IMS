@@ -2,8 +2,6 @@ package project.InventoryManagmentSystem.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,11 +11,15 @@ import project.InventoryManagmentSystem.dto.LoginRequest;
 import project.InventoryManagmentSystem.dto.RegisterRequest;
 import project.InventoryManagmentSystem.dto.Response;
 import project.InventoryManagmentSystem.service.UserService;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
+
     @Autowired
     private final UserService userService;
 
@@ -26,7 +28,7 @@ public class AuthController {
         return ResponseEntity.ok(userService.registerUser(registerRequest));
     }
 
-    @PostMapping(value = "/login", consumes = "application/json")
+    @PostMapping("/login")
     public ResponseEntity<Response> loginUser(@RequestBody @Valid LoginRequest loginRequest) {
         return ResponseEntity.ok(userService.loginUser(loginRequest));
     }

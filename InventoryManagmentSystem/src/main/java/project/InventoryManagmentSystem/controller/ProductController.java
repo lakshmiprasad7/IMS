@@ -1,8 +1,6 @@
 package project.InventoryManagmentSystem.controller;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -11,14 +9,19 @@ import project.InventoryManagmentSystem.dto.ProductDTO;
 import project.InventoryManagmentSystem.dto.Response;
 import project.InventoryManagmentSystem.service.ProductService;
 
+
+
+
 import java.math.BigDecimal;
+
 
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class ProductController {
-     @Autowired
     private final ProductService productService;
+    
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -89,6 +92,7 @@ public class ProductController {
     public ResponseEntity<Response> searchProduct(@RequestParam String input) {
         return ResponseEntity.ok(productService.searchProduct(input));
     }
+
 
 
 }

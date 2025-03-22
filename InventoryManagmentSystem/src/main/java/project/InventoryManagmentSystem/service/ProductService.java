@@ -1,5 +1,7 @@
 package project.InventoryManagmentSystem.service;
 
+
+
 import org.springframework.web.multipart.MultipartFile;
 import project.InventoryManagmentSystem.dto.ProductDTO;
 import project.InventoryManagmentSystem.dto.Response;
@@ -16,4 +18,5 @@ public interface ProductService {
     Response deleteProduct(Long id);
 
     Response searchProduct(String input);
+    
 }

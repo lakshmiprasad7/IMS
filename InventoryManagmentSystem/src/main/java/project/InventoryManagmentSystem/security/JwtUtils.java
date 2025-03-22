@@ -31,8 +31,6 @@ public class JwtUtils {
         this.key = new SecretKeySpec(keyByte, "HmacSHA256");
     }
 
-
-
     public String generateToken(String email) {
         return Jwts.builder()
                 .subject(email)
@@ -41,7 +39,6 @@ public class JwtUtils {
                 .signWith(key)
                 .compact();
     }
-
 
     public String getUsernameFromToken(String token) {
         return extractClaims(token, Claims::getSubject);

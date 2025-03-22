@@ -2,8 +2,6 @@ package project.InventoryManagmentSystem.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -11,11 +9,14 @@ import project.InventoryManagmentSystem.dto.Response;
 import project.InventoryManagmentSystem.dto.SupplierDTO;
 import project.InventoryManagmentSystem.service.SupplierService;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 @RestController
 @RequestMapping("/api/suppliers")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class SupplierController {
-     @Autowired
+    @Autowired
     private final SupplierService supplierService;
 
     @PostMapping("/add")

@@ -1,13 +1,12 @@
 package project.InventoryManagmentSystem.dto;
 
-
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import project.InventoryManagmentSystem.enums.TransactionStatus;
 import project.InventoryManagmentSystem.enums.TransactionType;
@@ -16,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
